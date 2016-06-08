@@ -2,6 +2,7 @@ package com.example.afa.watchdemo;
 
 import android.Manifest;
 import android.app.Notification;
+import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -16,8 +17,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -50,8 +54,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private Location lastLocation;
 
+    private ListView locationsListView;
     private TextView tickerTextView;
     private int ticker = 0;
+
+    private PlaceArrayAdapter placeArrayAdapter;
+    private ArrayList<PlaceModel> placeModels = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,15 +90,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-        Button button = (Button) findViewById(R.id.actionButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendNotification();
-            }
-        });
-
+        locationsListView = (ListView) findViewById(R.id.locations_listview);
         tickerTextView = (TextView) findViewById(R.id.ticker);
+
+        placeModels.addAll(getMockPlaces());
+
+        placeArrayAdapter = new PlaceArrayAdapter(this, R.layout.place_row, placeArrayAdapter);
     }
 
     @Override
@@ -190,12 +195,41 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private List<PlaceModel> getMockPlaces() {
-        List<PlaceModel> places = new ArrayList();
+        List<PlaceModel> places = new ArrayList<>();
         places.add(new PlaceModel("Random sted 1", 56.274285, 10.305495));
         places.add(new PlaceModel("Random sted 2", 56.274287, 10.305406));
         places.add(new PlaceModel("Random sted 3", 56.274296, 10.305245));
         places.add(new PlaceModel("Random sted 4", 56.274278, 10.305744));
 
         return places;
+    }
+
+    private class PlaceArrayAdapter extends ArrayAdapter<PlaceModel> {
+
+        private Context mContext;
+        private int mResource;
+        private List<PlaceModel> mPlaceModelList;
+
+        public PlaceArrayAdapter(Context context, int resource, List<PlaceModel> placeModelList) {
+            super(context, resource, placeModelList);
+
+            this.mContext = context;
+            this.mResource = resource;
+            this.mPlaceModelList = placeModelList;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if(convertView == null) {
+                LayoutInflater inflater = LayoutInflater.from(mContext);
+                convertView = inflater.inflate(mResource, parent, false);
+            }
+
+            PlaceModel place = mPlaceModelList.get(position);
+
+
+
+            return convertView;
+        }
     }
 }
