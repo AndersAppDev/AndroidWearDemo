@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private void sendNotification() {
         String contentTitle = "HackerDays";
-        String contentText = "Android Wear & Java 8";
+        String contentText = lastLocation != null ? lastLocation.toString() : "Not located yet";
 
         Notification notification = new NotificationCompat.Builder(getApplication())
                 .setSmallIcon(R.mipmap.ic_launcher)
