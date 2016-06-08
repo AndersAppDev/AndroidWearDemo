@@ -1,6 +1,7 @@
 package com.example.afa.watchdemo;
 
 import android.Manifest;
+import android.app.Notification;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,7 +11,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -141,5 +144,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Location changed");
         Snackbar.make(findViewById(R.id.content_main), "Lat: " + location.getLatitude() + "\n" + "Lng: " + location.getLongitude(), Snackbar.LENGTH_LONG).show();
+    }
+
+    public void sendNotification(View view) {
+        String toSend = "Stuff";
+        if(toSend.isEmpty())
+            toSend = "You sent an empty notification";
+        Notification notification = new NotificationCompat.Builder(getApplication())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("AndroidAuthority")
+                .setContentText(toSend)
+                .extend(new NotificationCompat.WearableExtender().setHintShowBackgroundOnly(true))
+                .build();
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplication());
+        int notificationId = 1;
+        notificationManager.notify(notificationId, notification);
     }
 }

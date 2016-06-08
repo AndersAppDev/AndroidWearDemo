@@ -19,4 +19,13 @@
         app:layout_constraintRight_toRightOf="@+id/content_main"
         app:layout_constraintTop_toTopOf="@+id/content_main"/>
 
+    <Button
+        android:id="@+id/actionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:text="@string/show_notification"
+        android:onClick="sendNotification" />
+
 </android.support.constraint.ConstraintLayout>
