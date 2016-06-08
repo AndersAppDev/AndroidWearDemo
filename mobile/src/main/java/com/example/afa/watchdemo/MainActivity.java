@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendNotification(v);
+                sendNotification();
             }
         });
 
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         tickerTextView.setText("Updated: " + ticker);
     }
 
-    private void sendNotification(View view) {
+    private void sendNotification() {
         String contentTitle = "HackerDays";
         String contentText = "Android Wear & Java 8";
 
@@ -176,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
+                .setLocalOnly(false)
                 .extend(new NotificationCompat.WearableExtender().setHintShowBackgroundOnly(true))
                 .build();
 
