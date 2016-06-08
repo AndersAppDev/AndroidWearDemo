@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +33,10 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
@@ -184,6 +189,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         tickerTextView.setText("Updated: " + ticker);
 
         placeArrayAdapter.notifyDataSetChanged();
+
+        new DataTask().execute();
+    }
+
+    private class DataTask extends AsyncTask<Void, Void, Void> {
+
+        DataTask() {
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Log.d(TAG, "doInBackground - start");
+            PutDataMapRequest dataMap = PutDataMapRequest.create("/location/update");
+            Log.d(TAG, "put: " + lastLocation.getLatitude());
+            dataMap.getDataMap().putDouble("latitude", lastLocation.getLatitude());
+
+            final PutDataRequest request = dataMap.asPutDataRequest();
+
+            DataApi.DataItemResult dataItemResult = Wearable.DataApi.putDataItem(mGoogleApiClient, request).await();
+
+            Log.d(TAG, "doInBackground - end");
+
+            DataMapItem dataItem = DataMapItem.fromDataItem (dataItemResult.getDataItem());
+            double latitude = dataItem.getDataMap().getDouble("latitude");
+            Log.d(TAG, "await: " + latitude);
+            return null;
+        }
     }
 
     private String getDistanceToText(Location to) {
