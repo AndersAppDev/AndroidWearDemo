@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendNotification();
+                sendNotification(null);
             }
         });
 
@@ -172,9 +172,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         tickerTextView.setText("Updated: " + ticker);
     }
 
-    private void sendNotification() {
-        String contentTitle = "HackerDays";
-        String contentText = lastLocation != null ? lastLocation.toString() : "Not located yet";
+    private void sendNotification(PlaceModel destination) {
+        String contentTitle = lastLocation != null ? "Distance to " + destination.name : "Not yet located";
+        String contentText = lastLocation != null ? lastLocation.distanceTo(destination.location) + " meters" : "Wait for proper GPS signal";
 
         Notification notification = new NotificationCompat.Builder(getApplication())
                 .setSmallIcon(R.mipmap.ic_launcher)
