@@ -17,6 +17,8 @@ import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,6 +32,8 @@ import com.google.android.gms.wearable.Wearable;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -45,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private LocationRequest locationRequest;
 
     private Location lastLocation;
+
+    private TextView tickerTextView;
+    private int ticker = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +75,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 if (lastLocation != null) {
                     Snackbar.make(findViewById(R.id.content_main), "Lat: " + lastLocation.getLatitude() + "\n" + "Lng: " + lastLocation.getLongitude(), Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
+
+        Button button = (Button) findViewById(R.id.actionButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendNotification();
+            }
+        });
+
+        tickerTextView = (TextView) findViewById(R.id.ticker);
     }
 
     @Override
@@ -150,21 +167,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Location changed");
         lastLocation = location;
+
+        ticker++;
+        tickerTextView.setText("Updated: " + ticker);
     }
 
-    public void sendNotification(View view) {
-        String toSend = "Stuff";
-        if (toSend.isEmpty())
-            toSend = "You sent an empty notification";
+    private void sendNotification() {
+        String contentTitle = "HackerDays";
+        String contentText = lastLocation != null ? lastLocation.toString() : "Not located yet";
 
         Notification notification = new NotificationCompat.Builder(getApplication())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Hey!")
-                .setContentText(toSend)
+                .setContentTitle(contentTitle)
+                .setContentText(contentText)
+                .setLocalOnly(false)
                 .extend(new NotificationCompat.WearableExtender().setHintShowBackgroundOnly(true))
                 .build();
+
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplication());
-        int notificationId = 1;
+        int notificationId = 9283;
         notificationManager.notify(notificationId, notification);
     }
 
