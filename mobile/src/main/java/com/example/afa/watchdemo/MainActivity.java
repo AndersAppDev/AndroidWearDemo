@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
 
+    private Location lastLocation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,8 +63,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(findViewById(R.id.content_main), "Lat: " + lastLocation.getLatitude() + "\n" + "Lng: " + lastLocation.getLongitude(), Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -74,12 +75,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     @Override
-    public void onStop() {
+    public void onPause() {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
-        super.onStop();
+        super.onPause();
     }
 
     @Override
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             return;
         }
 
-        try {
+        if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi
                     .requestLocationUpdates(mGoogleApiClient, locationRequest, this)
                     .setResultCallback(new ResultCallback<Status>() {
@@ -109,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                             }
                         }
                     });
-        } catch (Exception ignored) {
         }
     }
 
@@ -140,6 +140,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Location changed");
-        Snackbar.make(findViewById(R.id.content_main), "Lat: " + location.getLatitude() + "\n" + "Lng: " + location.getLongitude(), Snackbar.LENGTH_LONG).show();
+        lastLocation = location;
     }
 }
