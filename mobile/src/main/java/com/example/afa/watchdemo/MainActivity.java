@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,7 +37,6 @@ import com.google.android.gms.wearable.Wearable;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private final int REQUEST_CONNECTION_FAILURE_RESOLUTION = 9000;
 
-    private static final int UPDATE_INTERVAL_MS = 5000;
-    private static final int FASTEST_INTERVAL_MS = 3000;
+    private static final int UPDATE_INTERVAL_MS = 1000;
+    private static final int FASTEST_INTERVAL_MS = 500;
 
     private static final int REQUEST_CODE = 1337;
 
@@ -95,7 +95,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         placeModels.addAll(getMockPlaces());
 
-        placeArrayAdapter = new PlaceArrayAdapter(this, R.layout.place_row, placeArrayAdapter);
+        placeArrayAdapter = new PlaceArrayAdapter(this, R.layout.place_row, placeModels);
+        locationsListView.setAdapter(placeArrayAdapter);
+        locationsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                sendNotification(placeModels.get(position));
+            }
+        });
     }
 
     @Override
@@ -175,11 +182,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         ticker++;
         tickerTextView.setText("Updated: " + ticker);
+
+        placeArrayAdapter.notifyDataSetChanged();
     }
 
-    private void sendNotification() {
-        String contentTitle = "HackerDays";
-        String contentText = lastLocation != null ? lastLocation.toString() : "Not located yet";
+    private String getDistanceToText(Location to) {
+        return lastLocation != null ? lastLocation.distanceTo(to) + " meters" : "Wait for proper GPS signal";
+    }
+
+    private void sendNotification(PlaceModel destination) {
+        String contentTitle = lastLocation != null ? "Distance to " + destination.getName() : "Not yet located";
+        String contentText = getDistanceToText(destination.getLocation());
 
         Notification notification = new NotificationCompat.Builder(getApplication())
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -220,14 +233,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null) {
+            if (convertView == null) {
                 LayoutInflater inflater = LayoutInflater.from(mContext);
                 convertView = inflater.inflate(mResource, parent, false);
             }
 
             PlaceModel place = mPlaceModelList.get(position);
 
+            TextView name = (TextView) convertView.findViewById(R.id.place_name);
+            name.setText(place.getName());
 
+            TextView distance = (TextView) convertView.findViewById(R.id.distance);
+            distance.setText(getDistanceToText(place.getLocation()));
 
             return convertView;
         }
