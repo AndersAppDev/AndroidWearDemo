@@ -27,6 +27,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -153,14 +156,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         String toSend = "Stuff";
         if (toSend.isEmpty())
             toSend = "You sent an empty notification";
+
         Notification notification = new NotificationCompat.Builder(getApplication())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("AndroidAuthority")
+                .setContentTitle("Hey!")
                 .setContentText(toSend)
                 .extend(new NotificationCompat.WearableExtender().setHintShowBackgroundOnly(true))
                 .build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplication());
         int notificationId = 1;
         notificationManager.notify(notificationId, notification);
+    }
+
+    private List<PlaceModel> getMockPlaces() {
+        List<PlaceModel> places = new ArrayList();
+        places.add(new PlaceModel("Random sted 1", 56.274285, 10.305495));
+        places.add(new PlaceModel("Random sted 2", 56.274287, 10.305406));
+        places.add(new PlaceModel("Random sted 3", 56.274296, 10.305245));
+        places.add(new PlaceModel("Random sted 4", 56.274278, 10.305744));
+
+        return places;
     }
 }
